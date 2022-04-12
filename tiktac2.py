@@ -1,5 +1,4 @@
-
-import pygame, time
+import pygame
 
 logo=pygame.image.load('/Applications/code/tik tak project/mats/logo.png')
 
@@ -9,8 +8,8 @@ class tiktak:
         self.running=True
         pygame.init()
         pygame.font.init()
-        self.white=(255, 255, 255, 255)
-        self.black=(0,0,0, 0)
+        self.black=(255, 255, 255, 255)
+        self.white=(0,0,0, 0)
         pygame.display.set_icon(logo)
         pygame.display.set_caption('TikTak2.0')
         self.xaxis=600
@@ -21,40 +20,44 @@ class tiktak:
         self.boardd=[[0,0,0],
                     [0,0,0],
                     [0,0,0]]
-        
-        
         self.cross=(self.xaxis/3)/5
         self.board()
         self.playing()
         
     def gameover(self): # menu shown after game is over
         print('game over func')
-        textsurface = pygame.font.SysFont('Ariel', 40, True).render('GAME OVER', False, (0,0,0))
+        pygame.time.delay(600)
+        textsurface = pygame.font.SysFont('Ariel', 40, True).render('GAME OVER', False, self.black)
         self.screen.fill(self.white)
         self.screen.blit(textsurface,(self.line_x,self.line_y))
-        
-        
-
         if self.isSolved()[1] == 1:
             print('x won')
-            winner_surface=pygame.font.SysFont('Ariel', 40,True).render('X HAS WON', False,(0,0,0))
+            winner_surface=pygame.font.SysFont('Ariel', 40,True).render('X HAS WON', False,self.black)
             self.screen.blit(winner_surface,(self.line_x*1.01,self.line_y*1.2))
-            
+            pygame.display.update()
+            self.display_quit()
+
         elif self.isSolved()[1] == 2:
             print('O won')
-            winner_surface=pygame.font.SysFont('Ariel', 40,True).render('O HAS WON', False,(0,0,0))
+            winner_surface=pygame.font.SysFont('Ariel', 40,True).render('O HAS WON', False,self.black)
             self.screen.blit(winner_surface,(self.line_x*1.01,self.line_y*1.2))
-                        
+            pygame.display.flip()
+            self.display_quit()
+
         elif self.isSolved()[1] == 0:
             print('draw')
             winner_surface=pygame.font.SysFont('Ariel', 40,True).render('DRAW', False,(0,0,0))
             self.screen.blit(winner_surface,(self.line_x*1.25,self.line_y*1.2))
+            pygame.display.flip()
+            self.display_quit()
 
-        pygame.display.update()
-        input()
-        pygame.display.quit()
-            
+    def display_quit(self):
+        print('5 sec sleep')
+        #pygame.time.delay(2000)    
         
+        pygame.display.quit()
+        self.running=False
+
     def turns(self,drawing): # taking turns
         print('turns func')       
         if self.turn:
@@ -91,7 +94,6 @@ class tiktak:
         
     def board(self): # draws 4 lines for boardd and separates into 9 boxes
         print('board')
-        
         self.line_x=self.xaxis/3
         self.line_y=self.yaxis/3
         self.line1, self.line2, self.line3, self.line4 = (self.line_x,0),(self.line_x*2,0),(0,self.line_y),(0,2*self.line_y)
@@ -119,12 +121,11 @@ class tiktak:
             if boardd[i][0] == boardd[i][1] == boardd[i][2] != 0:
                 return True, boardd[i][0]
             elif boardd[0][i] == boardd[1][i] == boardd[2][i] != 0:
-                return True, boardd[0][i]
-                
+                return True, boardd[0][i]          
         if boardd[0][0] == boardd[1][1] == boardd[2][2] != 0:
             return True, boardd[0][0]
         elif boardd[0][2] == boardd[1][1] == boardd[2][0] != 0:
-            return True, boardd[0][0]
+            return True, boardd[0][2]
 
         elif 0 not in boardd[0] and 0 not in boardd[1] and 0 not in boardd[2]:
             return True, 0
@@ -132,38 +133,31 @@ class tiktak:
             return False, -1
 
     def playing(self): # looping the actual game
-        print('playing')
-        
+        print('playing') 
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running=False
                     pygame.display.quit()
-
-
                 if event.type == pygame.MOUSEBUTTONUP:
                     pos = pygame.mouse.get_pos()
 
                     # finding which box user clicked
-                    
                     if pos[0]>self.box1[0][0] and pos[0]<self.box1[1][0] and pos[1]>self.box1[0][1] and pos[1]<self.box1[1][1]:
                         if self.boardd[0][0] == 0: 
-                            
                             self.boardd[0][0]=9
                             self.turns(self.box1)
-                        
-                        
+
                     if pos[0]>self.box2[0][0] and pos[0]<self.box2[1][0] and pos[1]>self.box2[0][1] and pos[1]<self.box2[1][1]:
                         if self.boardd[0][1] == 0: 
                             self.boardd[0][1]=9
                             self.turns(self.box2)
-                        
-                        
+
                     if pos[0]>self.box3[0][0] and pos[0]<self.box3[1][0] and pos[1]>self.box3[0][1] and pos[1]<self.box3[1][1]:
                         if self.boardd[0][2] == 0: 
                             self.boardd[0][2]=9
                             self.turns(self.box3)
-                        
+        
                     if pos[0]>self.box4[0][0] and pos[0]<self.box4[1][0] and pos[1]>self.box4[0][1] and pos[1]<self.box4[1][1]:
                         if self.boardd[1][0] == 0: 
                             self.boardd[1][0]=9
@@ -193,13 +187,18 @@ class tiktak:
                         if self.boardd[2][2] == 0: 
                             self.boardd[2][2]=9
                             self.turns(self.box9)
-
             if self.isSolved()[0]==True:
                 print('The game seems to be over')
-                self.running=False
+                #self.running=False
                 self.gameover()
-        
-        
-global play_again
 
-a=tiktak()
+    def play_again(self):
+        pass
+
+    def draw_lines(self):
+        pass
+
+
+
+if __name__ == "__main__":
+    a=tiktak()
